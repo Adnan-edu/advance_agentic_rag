@@ -1,0 +1,133 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pytest
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Ruff
+.ruff_cache/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.example
+.env.sample
+.env.template
+.env.backup
+.env.old
+.env.bak
+.env.orig
+.env.save
+.env.swp
+.env.~1~
+.env.~2~
+.env.~3~
+.env.~4~
+.env.~5~
+.env.~6~
+.env.~7~
+.env.~8~
+.env.~9~
+.env.~10~
+.env.~11~
+.env.~12~
+.env.~13~
+.env.~14~
+.env.~15~
+.env.~16~
+.env.~17~
+.env.~18~
+.env.~19~
+.env.~20~
+.env.~21~
+.env.~22~
+
+# Logs
+*.log
+
+# Local development
+local_settings.py
+
+# Database
+*.db
+*.sqlite3
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Node (if applicable)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
+*.bak
+*.orig
+*.save

@@ -1,0 +1,64 @@
+# =================================================================
+# Document Loader
+# =================================================================
+loader:
+  extensions: [".pdf", ".docx", ".xlsx", ".pptx", ".txt", ".md"]
+
+# =================================================================
+# Text Splitter
+# =================================================================
+splitter:
+  chunk_size: 10000
+  chunk_overlap: 2000
+  strategy: "markdown"   # "markdown" | "recursive"
+
+# =================================================================
+# Embedding Model
+# =================================================================
+embeddings:
+  provider: "ollama"
+  model: "nomic-embed-text"
+  base_url: "http://localhost:11434"
+
+# =================================================================
+# LLM — used for metadata extraction on every ingested document
+# =================================================================
+llm:
+  provider: "ollama"
+  model: "qwen3.5:9b"
+  base_url: "http://localhost:11434"
+  num_ctx: 65536         # optional — override context window if chunks are large
+
+# =================================================================
+# Metadata Extraction (optional)
+# =================================================================
+# metadata:
+#   config_file: "metadata.yaml"   # Custom fields (see Custom Metadata docs)
+#                                  # If omitted, defaults to: company_name,
+#                                  # doc_type, fiscal_quarter, fiscal_year
+
+# =================================================================
+# Vector Store (Qdrant)
+# =================================================================
+vectorstore:
+  url: "http://localhost:6333"
+  collection_name: "my_docs"
+  use_sparse: true       # Enables hybrid search (requires: pip install fastembed)
+  force_recreate: false  # Set true ONLY to wipe and rebuild the collection
+
+# =================================================================
+# Retriever
+# =================================================================
+retriever:
+  search_type: "hybrid"  # "similarity" | "mmr" | "hybrid"
+  top_k: 5
+  auto_filter: false     # set true to enable LLM-based filter extraction from every query
+
+# =================================================================
+# Logging
+# =================================================================
+logging:
+  level: "INFO"
+  console_output: true
+  colored: true
+  # log_file: "logs/rag.log"

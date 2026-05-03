@@ -1,0 +1,26 @@
+embeddings:
+  provider: "openai"
+  model: "text-embedding-3-small"
+  api_key: "${OPENAI_API_KEY}"
+
+llm:
+  provider: "openai"
+  model: "gpt-4o-mini"
+  api_key: "${OPENAI_API_KEY}"
+
+vectorstore:
+  url: "http://localhost:6333"
+  collection_name: "finance-rag-openai"
+  use_sparse: true
+  force_recreate: false
+
+retriever:
+  search_type: "hybrid"
+  top_k: 5
+  auto_filter: false   # set true to enable LLM-based filter extraction from every query
+
+
+metadata:
+  config_file: "finance_metadata.yaml"   # Custom fields (see Custom Metadata docs)
+                                 # If omitted, defaults to: company_name,
+                                 # doc_type, fiscal_quarter, fiscal_year

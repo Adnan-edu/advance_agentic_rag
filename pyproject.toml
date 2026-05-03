@@ -1,0 +1,26 @@
+[project]
+name = "ragwire"
+version = "1.2.9"
+description = "RAGWire — Production-grade RAG toolkit for document ingestion and retrieval with hybrid search support"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastembed>=0.2.0",
+    "langchain>=0.1.0",
+    "langchain-anthropic>=0.0.0",
+    "langchain-community>=0.0.0",
+    "langchain-core>=0.1.0",
+    "langchain-google-genai>=0.0.0",
+    "langchain-groq>=0.0.0",
+    "langchain-huggingface>=0.0.0",
+    "langchain-ollama>=0.0.0",
+    "langchain-openai>=0.0.0",
+    "langchain-qdrant>=0.1.0",
+    "langchain-text-splitters>=0.0.1",
+    "markitdown[pdf]>=0.0.1",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
+    "qdrant-client>=1.6.0",
+    "tqdm>=4.66.0",
+]
