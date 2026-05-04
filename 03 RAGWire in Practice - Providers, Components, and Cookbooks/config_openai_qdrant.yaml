@@ -1,0 +1,35 @@
+embeddings:
+  provider: "openai"
+  model: "text-embedding-3-small"        # Cost-effective, high-quality embeddings
+  api_key: "${OPENAI_API_KEY}"
+
+llm:
+  provider: "openai"
+  model: "gpt-4.1-mini"                  # Best price/performance
+  api_key: "${OPENAI_API_KEY}"
+
+vectorstore:
+  url: "${QDRANT_URL}"
+  api_key: "${QDRANT_API_KEY}"
+  collection_name: "finance-rag-openai-qdrant"
+  use_sparse: true
+  force_recreate: false
+  ingest_batch_size: 50   # chunks per upload batch
+  timeout: 300            # seconds
+
+retriever:
+  search_type: "hybrid" # "similarity" | "mmr" | "hybrid"
+  top_k: 5
+  auto_filter: false   # set true to enable LLM-based filter extraction from every query
+
+
+metadata:
+  config_file: "finance_metadata.yaml"   # Custom fields (see Custom Metadata docs)
+                                 # If omitted, defaults to: company_name,
+                                 # doc_type, fiscal_quarter, fiscal_year
+
+logging:
+  level: "INFO"  # "DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL"
+  console_output: true  # true | false
+  colored: false  # true | false
+  log_file: "./.log/ragwire.log"

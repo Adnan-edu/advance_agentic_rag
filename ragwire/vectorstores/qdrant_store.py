@@ -55,17 +55,18 @@ class QdrantStore:
         # Extract configuration
         url = config.get("url", "http://localhost:6333")
         api_key = config.get("api_key")
+        timeout = config.get("timeout", 300)
 
         # Determine connection type
         if url.startswith("http://") or url.startswith("https://"):
             # Remote or local HTTP connection
-            self.client = QdrantClient(url=url, api_key=api_key)
-            logger.info(f"Connected to Qdrant at {url}")
+            self.client = QdrantClient(url=url, api_key=api_key, timeout=timeout)
+            logger.info(f"Connected to Qdrant at {url} (timeout={timeout}s)")
 
         else:
             # Local file-based storage (path may not exist yet — qdrant creates it)
-            self.client = QdrantClient(path=url)
-            logger.info(f"Using local Qdrant storage at {url}")
+            self.client = QdrantClient(path=url, timeout=timeout)
+            logger.info(f"Using local Qdrant storage at {url} (timeout={timeout}s)")
 
         self.embedding = embedding
         self.collection_name = collection_name

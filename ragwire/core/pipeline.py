@@ -231,6 +231,7 @@ class RAGWire:
         collection_name = vectorstore_config.get("collection_name", "rag_documents")
         use_sparse = vectorstore_config.get("use_sparse", True)
         force_recreate = vectorstore_config.get("force_recreate", False)
+        self._ingest_batch_size = vectorstore_config.get("ingest_batch_size", 50)
 
         self.vectorstore_wrapper = QdrantStore(
             config=vectorstore_config,
@@ -330,9 +331,12 @@ class RAGWire:
                     file_hash=file_hash,
                 )
 
-                # Add to vector store
+                # Add to vector store in batches to avoid write timeouts
                 if chunks:
-                    self.vectorstore.add_documents(chunks)
+                    batch_size = getattr(self, "_ingest_batch_size", 50)
+                    for i in range(0, len(chunks), batch_size):
+                        batch = chunks[i : i + batch_size]
+                        self.vectorstore.add_documents(batch)
                     stats["chunks_created"] += len(chunks)
                     stats["processed"] += 1
                     logger.info(f"Processed {file_path}: {len(chunks)} chunks")
