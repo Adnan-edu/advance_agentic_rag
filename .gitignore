@@ -127,6 +127,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Chainlit
+.chainlit/
+
 # Misc
 *.bak
 *.orig

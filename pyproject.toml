@@ -5,6 +5,7 @@ description = "RAGWire — Production-grade RAG toolkit for document ingestion a
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "chainlit>=2.11.1",
     "fastembed>=0.2.0",
     "langchain>=0.1.0",
     "langchain-anthropic>=0.0.0",

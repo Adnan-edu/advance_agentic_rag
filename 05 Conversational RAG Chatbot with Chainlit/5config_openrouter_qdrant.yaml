@@ -15,7 +15,7 @@ llm:
 vectorstore:
   url: "${QDRANT_URL}"
   api_key: "${QDRANT_API_KEY}"
-  collection_name: "health-rag-bge-m3-qdrant"   # New collection: bge-m3 is 1024-dim, incompatible with prior gemini-3072 vectors
+  collection_name: "finance-rag-qdrant"
   use_sparse: true
   force_recreate: false
 
@@ -26,7 +26,7 @@ retriever:
 
 
 metadata:
-  config_file: "health_metadata.yaml"   # Custom fields (see Custom Metadata docs)
+  config_file: "finance_metadata.yaml"   # Custom fields (see Custom Metadata docs)
                                  # If omitted, defaults to: company_name,
                                  # doc_type, fiscal_quarter, fiscal_year
 

@@ -182,7 +182,12 @@ class RAGWire:
                 llm = ChatOllama(model=model, base_url=base_url, **extra)
             elif provider == "openai":
                 from langchain_openai import ChatOpenAI
-                llm = ChatOpenAI(model=model)
+                openai_kwargs = {"model": model}
+                if "api_key" in llm_config and llm_config["api_key"]:
+                    openai_kwargs["api_key"] = llm_config["api_key"]
+                if "base_url" in llm_config and llm_config["base_url"]:
+                    openai_kwargs["base_url"] = llm_config["base_url"]
+                llm = ChatOpenAI(**openai_kwargs)
             elif provider == "google" or provider == "gemini":
                 from langchain_google_genai import ChatGoogleGenerativeAI
                 llm = ChatGoogleGenerativeAI(model=model, google_api_key=llm_config.get("api_key"))
