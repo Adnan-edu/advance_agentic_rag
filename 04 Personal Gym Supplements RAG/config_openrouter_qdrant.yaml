@@ -1,0 +1,36 @@
+embeddings:
+  provider: "huggingface"                # Local sentence-transformers via langchain-huggingface
+  model_name: "BAAI/bge-m3"              # Multilingual, 1024-dim, strong retrieval baseline
+  model_kwargs:
+    device: "cpu"                        # set "cuda" or "mps" if you have a GPU
+  encode_kwargs:
+    normalize_embeddings: true           # cosine-friendly; recommended for BGE family
+
+llm:
+  provider: "openai"                                # OpenAI-compatible client routed to OpenRouter via OPENAI_BASE_URL
+  model: "nvidia/nemotron-3-super-120b-a12b:free"   # Free model on OpenRouter
+  api_key: "${OPENROUTER_API_KEY}"
+
+vectorstore:
+  url: "${QDRANT_URL}"
+  api_key: "${QDRANT_API_KEY}"
+  collection_name: "health-rag-bge-m3-qdrant"   # New collection: bge-m3 is 1024-dim, incompatible with prior gemini-3072 vectors
+  use_sparse: true
+  force_recreate: false
+
+retriever:
+  search_type: "hybrid" # "similarity" | "mmr" | "hybrid"
+  top_k: 5
+  auto_filter: false   # set true to enable LLM-based filter extraction from every query
+
+
+metadata:
+  config_file: "health_metadata.yaml"   # Custom fields (see Custom Metadata docs)
+                                 # If omitted, defaults to: company_name,
+                                 # doc_type, fiscal_quarter, fiscal_year
+
+logging:
+  level: "INFO"  # "DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL"
+  console_output: true  # true | false
+  colored: false  # true | false
+  log_file: "./.log/ragwire.log"
