@@ -1,0 +1,41 @@
+embeddings:
+  provider: "huggingface"
+  model_name: "BAAI/bge-m3"
+  model_kwargs:
+    device: "cpu"
+  encode_kwargs:
+    normalize_embeddings: true
+
+llm:
+  provider: "openrouter"
+  model_tier: "free"
+  model_options:
+    # NVIDIA free endpoints may log prompts. Use public, non-sensitive documents only.
+    free: "nvidia/nemotron-3-super-120b-a12b:free"
+    paid: "nex-agi/nex-n2-mini"
+  api_key: "${OPENROUTER_API_KEY}"
+  base_url: "https://openrouter.ai/api/v1"
+  max_retries: 6
+
+vectorstore:
+  # This lesson uses the repository-local Qdrant started by ../start_qdrant.sh.
+  url: "http://localhost:6333"
+  api_key: "${QDRANT_API_KEY}"
+  collection_name: "finance-rag-qdrant"
+  use_sparse: true
+  force_recreate: false
+
+retriever:
+  search_type: "hybrid"
+  top_k: 5
+  auto_filter: false
+
+metadata:
+  config_file: "model_tier_config/metadata/finance_metadata.yaml"
+  fail_on_extraction_error: true
+
+logging:
+  level: "INFO"
+  console_output: true
+  colored: false
+  log_file: "./.log/ragwire.log"

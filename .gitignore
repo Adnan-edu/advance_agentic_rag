@@ -130,8 +130,14 @@ yarn-error.log*
 # Chainlit
 .chainlit/
 
+# Track only the stable Lesson 05 configuration; ignore generated state/translations.
+!05 Conversational RAG Chatbot with Chainlit/.chainlit/
+05 Conversational RAG Chatbot with Chainlit/.chainlit/*
+!05 Conversational RAG Chatbot with Chainlit/.chainlit/config.toml
+05 Conversational RAG Chatbot with Chainlit/.chainlit/translations/
+
 # Misc
 *.bak
 *.orig
 *.save
-scripts/
+README.md
