@@ -10,6 +10,15 @@ prompt: |
   5. **Integers**: Return the numeric value only — no units, symbols, or surrounding text.
   6. **Null**: Return null only when the field is genuinely not mentioned anywhere in the document.
 
+  ## Field-Specific Extraction Hints
+  - **publication_year**: Look for the year in the article header line (e.g. "Antioxidants 2025, 14, 1457"),
+    copyright lines (e.g. "© 2024 by the authors"), publication dates (e.g. "Published: 15 March 2024"),
+    acceptance dates, or DOI date stamps. The first page almost always contains it.
+  - **research_focus**: Identify the main topics the paper investigates from the title, abstract, and
+    section headings. Convert each topic to a lowercase-hyphenated label (e.g. "oxidative stress" →
+    "oxidative-stress", "hydration" → "hydration", "antioxidant supplementation" → "antioxidant-supplementation").
+    Scan the abstract and conclusions for key terms.
+
 fields:
   - name: title
     description: "Full title of the research paper exactly as it appears in the document. Do not paraphrase."
@@ -19,10 +28,12 @@ fields:
     type: list
 
   - name: publication_year
-    description: "Year the paper was published or last revised. Extract the 4-digit year only."
+    description: "Year the paper was published or last revised. Extract the 4-digit year only. Common locations: article header line (e.g. 'Antioxidants 2025, 14, 1457'), copyright lines, publication dates, acceptance dates."
     type: integer
+    required: true
 
   - name: research_focus
-    description: "List of all primary research topics covered, in lowercase-hyphenated format. Not limited to the examples — extract any focus area mentioned in the paper."
+    description: "List of all primary research topics covered, in lowercase-hyphenated format. Not limited to the examples — extract any focus area mentioned in the paper. Derive from title, abstract, and section headings."
     type: list
-    values: ["muscle-growth", "recovery", "performance", "endurance", "cognitive-function", "fat-loss", "safety", "hormonal"]
+    values: ["muscle-growth", "recovery", "performance", "endurance", "cognitive-function", "fat-loss", "safety", "hormonal", "oxidative-stress", "antioxidant-supplementation", "hydration", "nutrition", "protein-synthesis"]
+    required: true

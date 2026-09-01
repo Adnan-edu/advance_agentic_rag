@@ -63,41 +63,10 @@ dmypy.json
 
 # Environment variables
 .env
-.env.local
-.env.development
-.env.test
-.env.production
-.env.example
-.env.sample
-.env.template
-.env.backup
-.env.old
-.env.bak
-.env.orig
-.env.save
-.env.swp
-.env.~1~
-.env.~2~
-.env.~3~
-.env.~4~
-.env.~5~
-.env.~6~
-.env.~7~
-.env.~8~
-.env.~9~
-.env.~10~
-.env.~11~
-.env.~12~
-.env.~13~
-.env.~14~
-.env.~15~
-.env.~16~
-.env.~17~
-.env.~18~
-.env.~19~
-.env.~20~
-.env.~21~
-.env.~22~
+.env.*
+!.env.example
+!.env.sample
+!.env.template
 
 # Logs
 *.log
@@ -107,7 +76,17 @@ local_settings.py
 
 # Database
 *.db
+*.sqlite
 *.sqlite3
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+
+# Local vector stores accidentally created from unresolved URLs
+**/${QDRANT_URL}/
 
 # Coverage
 htmlcov/
@@ -128,16 +107,11 @@ yarn-debug.log*
 yarn-error.log*
 
 # Chainlit
-.chainlit/
-
-# Track only the stable Lesson 05 configuration; ignore generated state/translations.
-!05 Conversational RAG Chatbot with Chainlit/.chainlit/
-05 Conversational RAG Chatbot with Chainlit/.chainlit/*
-!05 Conversational RAG Chatbot with Chainlit/.chainlit/config.toml
-05 Conversational RAG Chatbot with Chainlit/.chainlit/translations/
+/.chainlit/
+**/.chainlit/translations/
 
 # Misc
 *.bak
 *.orig
 *.save
-README.md
+*.ses

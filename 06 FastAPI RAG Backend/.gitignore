@@ -1,0 +1,4 @@
+# Legacy lesson configs superseded by model_tier_config/.
+/config/config_openrouter_qdrant.yaml
+/config/6config_openrouter_qdrant.yaml
+/config/finance_metadata.yaml

@@ -10,14 +10,13 @@ from dotenv import load_dotenv
 
 load_dotenv("../.env")
 
-os.environ["OPENAI_API_KEY"] = os.environ["OPENROUTER_API_KEY"]
-os.environ["OPENAI_BASE_URL"] = "https://openrouter.ai/api/v1"
-
 from ragwire import RAGWire, setup_logging
 
 setup_logging(log_level="INFO")
 
-rag = RAGWire("5config_openrouter_qdrant.yaml")
+MODEL_TIER = os.getenv("RAGWIRE_MODEL_TIER", "free")
+rag = RAGWire("5config_openrouter_qdrant.yaml", model_tier=MODEL_TIER)
+print(f"Using {rag.model_tier} model: {rag.config['llm']['model']}")
 
 print("\n=== Ingesting documents ===")
 stats = rag.ingest_directory("../data/finance_data")

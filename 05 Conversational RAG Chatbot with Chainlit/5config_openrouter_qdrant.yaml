@@ -7,14 +7,18 @@ embeddings:
     normalize_embeddings: true           # cosine-friendly; recommended for BGE family
 
 llm:
-  provider: "openai"
-  model: "nvidia/nemotron-3-super-120b-a12b:free"
+  provider: "openrouter"
+  model_tier: "free"
+  model_options:
+    # NVIDIA free endpoints may log prompts. Use public, non-sensitive documents only.
+    free: "nvidia/nemotron-3-super-120b-a12b:free"
+    paid: "nex-agi/nex-n2-mini"
   api_key: "${OPENROUTER_API_KEY}"
   base_url: "https://openrouter.ai/api/v1"
+  max_retries: 6
 
 vectorstore:
-  url: "${QDRANT_URL}"
-  api_key: "${QDRANT_API_KEY}"
+  url: "http://localhost:6333"
   collection_name: "finance-rag-qdrant"
   use_sparse: true
   force_recreate: false
@@ -27,6 +31,7 @@ retriever:
 
 metadata:
   config_file: "finance_metadata.yaml"   # Custom fields (see Custom Metadata docs)
+  fail_on_extraction_error: true          # Never store finance chunks without filter metadata.
                                  # If omitted, defaults to: company_name,
                                  # doc_type, fiscal_quarter, fiscal_year
 

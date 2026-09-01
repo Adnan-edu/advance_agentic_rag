@@ -87,9 +87,9 @@ class MetadataExtractor:
     )
 
     # Content sampling windows (characters)
-    PREFIX_CHARS = 5000        # contiguous document prefix sent to the LLM
-    OUTLINE_CHARS = 1500       # cap on the appended markdown heading outline
-    ESCALATION_CHARS = 18000   # larger window for the second-pass retry
+    PREFIX_CHARS = 3000        # contiguous document prefix sent to the LLM
+    OUTLINE_CHARS = 1000       # cap on the appended markdown heading outline
+    ESCALATION_CHARS = 12000   # larger window for the second-pass retry
 
     def __init__(
         self,

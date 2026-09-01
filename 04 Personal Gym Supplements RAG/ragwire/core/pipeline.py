@@ -95,7 +95,6 @@ class RAGWire:
         loader: Document loader instance
         splitter: Text splitter instance
         embedding: Embedding model instance
-        llm: Initialized chat model used by metadata extraction and reusable by agents
         vectorstore: Qdrant vector store instance
         retriever: Retriever instance
 
@@ -105,7 +104,7 @@ class RAGWire:
         >>> results = rag.retrieve("What is Amazon's revenue?")
     """
 
-    def __init__(self, config_path: str, model_tier: Optional[str] = None):
+    def __init__(self, config_path: str):
         """
         Initialize the RAG pipeline.
 
@@ -115,8 +114,6 @@ class RAGWire:
 
         Args:
             config_path: Path to configuration YAML file
-            model_tier: Optional OpenRouter model tier override. When the
-                        config defines llm.model_options, use "free" or "paid".
 
         Raises:
             FileNotFoundError: If config file doesn't exist
@@ -127,7 +124,6 @@ class RAGWire:
         # Load configuration — Config parses the YAML and resolves
         # ${ENV_VAR} placeholders; we keep just the resulting dict.
         self.config = Config(config_path).config
-        self._select_model_tier(model_tier)
 
         # Cache for stored filter values — populated on first query, invalidated after ingestion
         # (avoids hitting Qdrant's facet API on every single filter extraction).
@@ -146,38 +142,6 @@ class RAGWire:
         self._initialize_retriever()    # search wrapper over the vector store
 
         logger.info("RAG pipeline initialized successfully")
-
-    def _select_model_tier(self, model_tier: Optional[str]) -> None:
-        """Resolve a named LLM tier into the concrete configured model ID."""
-        llm_config = self.config.get("llm", {})
-        model_options = llm_config.get("model_options")
-
-        # Backward compatibility for configs that define only llm.model.
-        if not model_options:
-            if model_tier is not None:
-                raise ValueError(
-                    "model_tier was provided, but llm.model_options is missing "
-                    "from the configuration"
-                )
-            self.model_tier = None
-            return
-
-        selected_tier = model_tier or llm_config.get("model_tier", "free")
-        if selected_tier not in {"free", "paid"}:
-            raise ValueError(
-                f"Invalid model_tier '{selected_tier}'. Valid options: free, paid"
-            )
-
-        selected_model = model_options.get(selected_tier)
-        if not isinstance(selected_model, str) or not selected_model.strip():
-            raise ValueError(
-                f"llm.model_options.{selected_tier} must contain a model ID"
-            )
-
-        llm_config["model_tier"] = selected_tier
-        llm_config["model"] = selected_model
-        self.model_tier = selected_tier
-        logger.info(f"Selected {selected_tier} LLM model: {selected_model}")
 
     def _initialize_logging(self) -> None:
         """Apply logging configuration from config file."""
@@ -273,7 +237,6 @@ class RAGWire:
         _llm_install = {
             "ollama": "pip install langchain-ollama",
             "openai": "pip install \"ragwire[openai]\"",
-            "openrouter": "pip install \"ragwire[openai]\"",
             "google": "pip install \"ragwire[google]\"",
             "gemini": "pip install \"ragwire[google]\"",
             "groq": "pip install \"ragwire[groq]\"",
@@ -289,24 +252,15 @@ class RAGWire:
                 if "num_ctx" in llm_config:
                     extra["num_ctx"] = llm_config["num_ctx"]
                 llm = ChatOllama(model=model, base_url=base_url, **extra)
-            elif provider == "openai" or provider == "openrouter":
+            elif provider == "openai":
                 from langchain_openai import ChatOpenAI
                 # api_key/base_url only passed when set — a custom base_url is
                 # how OpenAI-compatible gateways (e.g. OpenRouter) are supported.
                 openai_kwargs = {"model": model}
                 if "api_key" in llm_config and llm_config["api_key"]:
                     openai_kwargs["api_key"] = llm_config["api_key"]
-                if provider == "openrouter":
-                    openai_kwargs["base_url"] = llm_config.get(
-                        "base_url", "https://openrouter.ai/api/v1"
-                    )
-                elif "base_url" in llm_config and llm_config["base_url"]:
+                if "base_url" in llm_config and llm_config["base_url"]:
                     openai_kwargs["base_url"] = llm_config["base_url"]
-                # Free/shared gateways can return transient 429/5xx responses.
-                # Keep retries configurable instead of hard-coding gateway-specific
-                # behavior into the provider adapter.
-                if "max_retries" in llm_config:
-                    openai_kwargs["max_retries"] = llm_config["max_retries"]
                 llm = ChatOpenAI(**openai_kwargs)
             elif provider == "google" or provider == "gemini":
                 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -319,7 +273,7 @@ class RAGWire:
                 llm = ChatAnthropic(model=model, anthropic_api_key=llm_config.get("api_key"))
             else:
                 # Unknown provider string in the config — list the valid ones.
-                valid = "ollama, openai, openrouter, google, groq, anthropic"
+                valid = "ollama, openai, google, groq, anthropic"
                 raise ValueError(
                     f"Unsupported LLM provider: '{provider}'. Valid options: {valid}"
                 )
@@ -330,10 +284,6 @@ class RAGWire:
                 f"Required package for LLM provider '{provider}' is not installed.\n"
                 f"Run: {install_cmd}"
             )
-
-        # Public model instance for callers that build LangChain/LangGraph agents.
-        # Reusing it keeps agent calls on the same provider/model tier as metadata.
-        self.llm = llm
 
         # Wire the LLM into the metadata extractor. A metadata.config_file
         # (e.g. health_metadata.yaml) defines *custom* fields per domain;
@@ -605,15 +555,9 @@ class RAGWire:
                 llm_metadata = self.extract_metadata(text)
                 logger.debug(f"LLM metadata for {file_name}: {llm_metadata}")
             except Exception as e:
-                message = f"LLM metadata extraction failed for {file_name}: {e}"
-                # Metadata-heavy workflows should fail the file instead of
-                # silently storing chunks that can never match domain filters.
-                metadata_config = self.config.get("metadata", {})
-                if metadata_config.get("fail_on_extraction_error", False):
-                    raise RuntimeError(message) from e
-
-                # Backward-compatible default: ingest with system metadata only.
-                logger.warning(message)
+                # Metadata is best-effort: a failed extraction must not block
+                # ingestion — the chunks still go in with system metadata only.
+                logger.warning(f"LLM metadata extraction failed for {file_name}: {e}")
 
         # Wrap each chunk in a LangChain Document carrying two metadata layers:
         # system fields (source, hashes, indices) + LLM-extracted domain fields.

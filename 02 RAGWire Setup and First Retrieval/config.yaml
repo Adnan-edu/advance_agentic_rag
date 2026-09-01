@@ -1,16 +1,24 @@
 embeddings:
-  provider: "openai"
-  model: "text-embedding-3-small"
-  api_key: "${OPENAI_API_KEY}"
+  # OpenRouter does not provide embeddings. Keep them local and free.
+  provider: "fastembed"
+  model_name: "BAAI/bge-base-en-v1.5"
 
 llm:
-  provider: "openai"
-  model: "gpt-4o-mini"
-  api_key: "${OPENAI_API_KEY}"
+  # OpenRouter uses LangChain's OpenAI-compatible transport internally.
+  provider: "openrouter"
+  model_tier: "free"  # Default; override with RAGWire(..., model_tier="paid").
+  model_options:
+    # NVIDIA may log free-endpoint prompts; use public/non-sensitive documents only.
+    free: "nvidia/nemotron-3-super-120b-a12b:free"
+    paid: "nex-agi/nex-n2-mini"
+  api_key: "${OPENROUTER_API_KEY}"
+  base_url: "https://openrouter.ai/api/v1"
+  max_retries: 6  # Mitigates transient shared-pool 429/5xx errors; not a reliability guarantee.
 
 vectorstore:
   url: "http://localhost:6333"
-  collection_name: "finance-rag-openai"
+  # A new name avoids mixing vectors produced by a different embedding model.
+  collection_name: "finance-rag-bge-base-openrouter"
   use_sparse: true
   force_recreate: false
 
@@ -22,5 +30,6 @@ retriever:
 
 metadata:
   config_file: "finance_metadata.yaml"   # Custom fields (see Custom Metadata docs)
-                                 # If omitted, defaults to: company_name,
-                                 # doc_type, fiscal_quarter, fiscal_year
+  fail_on_extraction_error: true          # Never store finance chunks without filter metadata.
+  # If config_file is omitted, fields default to:
+  # company_name, doc_type, fiscal_quarter, fiscal_year

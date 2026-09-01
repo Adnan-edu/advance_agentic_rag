@@ -1,5 +1,5 @@
 embeddings:
-  # Dense local embeddings: one smaller model, no sentence-transformers stack.
+  # Match Lesson 02 and the existing local collection; no embedding API calls.
   provider: "fastembed"
   model_name: "BAAI/bge-base-en-v1.5"
 
@@ -17,10 +17,8 @@ llm:
 vectorstore:
   # Local Qdrant started by ../start_qdrant.sh from this lesson directory.
   url: "http://localhost:6333"
-  api_key: "${QDRANT_API_KEY}"
-  # Different embedding model from BGE-M3, so use a separate collection.
-  collection_name: "health-rag-bge-base-fastembed"
-  use_sparse: false
+  collection_name: "finance-rag-bge-base-openrouter"
+  use_sparse: true
   force_recreate: false
   ingest_batch_size: 50
   timeout: 300
@@ -31,7 +29,7 @@ retriever:
   auto_filter: false
 
 metadata:
-  config_file: "health_metadata.yaml"
+  config_file: "finance_metadata.yaml"
   fail_on_extraction_error: true
 
 logging:
